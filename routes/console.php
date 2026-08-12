@@ -1,8 +1,14 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Models\Watch;
+use App\Jobs\CheckWatchJob;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+Schedule::call(function () {
+    Watch::where('is_active', true)
+        ->where(function ($q) {
+            $q->whereNull('last_checked_at')
+              ->orWhereRaw('(strftime("%s","now") - strftime("%s", last_checked_at)) / 60 >= check_frequency_minutes');
+        })
+        ->each(fn ($watch) => CheckWatchJob::dispatch($watch));
+})->everyMinute();
