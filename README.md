@@ -1,58 +1,91 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Watchpoint
 
-## About Laravel
+### Automated webpage change detection and alerting
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+[![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat-square&logo=php&logoColor=white)](https://php.net)
+[![SQLite](https://img.shields.io/badge/SQLite-07405E?style=flat-square&logo=sqlite&logoColor=white)](https://sqlite.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![Alpine.js](https://img.shields.io/badge/Alpine.js-8BC0D0?style=flat-square&logo=alpine.js&logoColor=black)](https://alpinejs.dev)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+</div>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Overview
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Watchpoint monitors any public webpage on a user-defined schedule and sends an alert the moment its content changes. Rather than reporting a generic "this page changed," it identifies and reports the specific lines that were added or removed — useful for tracking price changes, job postings, government notices, or any page without an RSS feed.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## How it works
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Naive change detection compares raw HTML, which triggers false positives constantly — ad refreshes, timestamps, and tracking scripts all cause the page source to change without any meaningful content actually changing.
 
-## Agentic Development
+Watchpoint avoids this by cleaning the page before comparison:
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+1. **Fetch** — retrieve the page HTML for a given URL.
+2. **Clean** — strip scripts, navigation, headers, and footers, then normalize whitespace, leaving only meaningful content.
+3. **Hash** — compute a hash of the cleaned text. If it matches the previous check, nothing happened.
+4. **Diff** — if the hash differs, generate a line-level diff between the previous and current content.
+5. **Notify** — email the user with a summary of exactly what changed.
+
+This pipeline runs on a schedule per watch, using Laravel's task scheduler and queue system.
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Backend | Laravel 12 (PHP) |
+| Database | SQLite |
+| Frontend | Blade, Tailwind CSS, Alpine.js |
+| HTML parsing | Symfony DomCrawler |
+| Diffing | jfcherng/php-diff |
+| Background processing | Laravel Queues, Task Scheduler |
+| Email | Laravel Mail (Markdown mailables) |
+
+## Architecture
+
+**Data model**
+
+- `watches` — a monitored URL, its check frequency, optional CSS selector scope, and last known hash.
+- `snapshots` — the cleaned text content captured at each check.
+- `change_logs` — a record of detected changes, linking the old and new snapshots with a diff summary.
+
+**Core services**
+
+- `PageFetcher` — retrieves and cleans page content, and computes its hash.
+- `DiffGenerator` — produces a human-readable diff between two snapshots.
+- `CheckWatchJob` — orchestrates a single check: fetch, hash, compare, diff, log, and notify.
+
+## Getting started
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/YOUR-USERNAME/watchpoint.git
+cd watchpoint
+composer install
+npm install && npm run build
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+To process checks, run the scheduler and queue worker alongside the app:
 
-## Contributing
+```bash
+php artisan schedule:work
+php artisan queue:work
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Possible improvements at scale
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- Replace fixed-interval polling with adaptive check frequency based on how often a given page actually changes.
+- Move diff generation onto a dedicated queue worker pool to handle higher watch volume.
+- Add per-user rate limits on watch creation to prevent abuse.
+- Cache recently fetched pages to avoid redundant fetches when multiple users watch the same URL.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open source and available under the MIT License.
