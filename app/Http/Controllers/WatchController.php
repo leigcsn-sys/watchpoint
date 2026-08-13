@@ -2,63 +2,62 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Watch;
+use App\Jobs\CheckWatchJob;
 use Illuminate\Http\Request;
 
 class WatchController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $watches = auth()->user()->watches()->latest()->get();
+        return view('watches.index', compact('watches'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('watches.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'url' => 'required|url|max:2048',
+            'css_selector' => 'nullable|string|max:255',
+            'check_frequency_minutes' => 'required|integer|min:5',
+        ]);
+
+        $validated['user_id'] = auth()->id();
+
+        Watch::create($validated);
+
+        return redirect()->route('watches.index')->with('status', 'Watch created.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Watch $watch)
     {
-        //
+        abort_unless($watch->user_id === auth()->id(), 403);
+
+        $changeLogs = $watch->changeLogs()->latest('detected_at')->get();
+
+        return view('watches.show', compact('watch', 'changeLogs'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy(Watch $watch)
     {
-        //
+        abort_unless($watch->user_id === auth()->id(), 403);
+
+        $watch->delete();
+
+        return redirect()->route('watches.index')->with('status', 'Watch deleted.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function checkNow(Watch $watch)
     {
-        //
-    }
+        abort_unless($watch->user_id === auth()->id(), 403);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        CheckWatchJob::dispatchSync($watch);
+
+        return redirect()->route('watches.show', $watch)->with('status', 'Check complete.');
     }
 }
