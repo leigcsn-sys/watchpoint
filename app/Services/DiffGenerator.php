@@ -1,3 +1,5 @@
+<?php
+
 namespace App\Services;
 
 use Jfcherng\Diff\Differ;
