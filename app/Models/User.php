@@ -29,4 +29,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function watches() {
+        return $this->hasMany(Watch::class);
+    }
 }
