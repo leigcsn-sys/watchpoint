@@ -19,8 +19,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::resource('watches', WatchController::class);
-    Route::get('watches/{watch}/history', [WatchController::class, 'history'])->name('watches.history');
+    Route::resource('watches', WatchController::class)->except(['edit', 'update']);
+    Route::post('watches/{watch}/check', [WatchController::class, 'checkNow'])->name('watches.check');
 });
 
 require __DIR__.'/auth.php';
