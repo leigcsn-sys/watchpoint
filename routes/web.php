@@ -19,8 +19,13 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::resource('watches', WatchController::class)->except(['edit', 'update']);
-    Route::post('watches/{watch}/check', [WatchController::class, 'checkNow'])->name('watches.check');
+    Route::resource('watches', WatchController::class)
+        ->except(['edit', 'update'])
+        ->middleware(['throttle:20,1']); // 20 requests per minute across the resource
+
+    Route::post('watches/{watch}/check', [WatchController::class, 'checkNow'])
+        ->middleware('throttle:5,1') // max 5 manual checks per minute
+        ->name('watches.check');
 });
 
 require __DIR__.'/auth.php';
