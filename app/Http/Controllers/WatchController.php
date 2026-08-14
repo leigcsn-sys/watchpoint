@@ -56,6 +56,11 @@ class WatchController extends Controller
     {
         abort_unless($watch->user_id === auth()->id(), 403);
 
+        if ($watch->last_checked_at && $watch->last_checked_at->diffInSeconds(now()) < 30) {
+            return redirect()->route('watches.show', $watch)
+                ->with('status', 'Please wait a moment before checking again.');
+        }
+
         CheckWatchJob::dispatchSync($watch);
 
         return redirect()->route('watches.show', $watch)->with('status', 'Check complete.');
