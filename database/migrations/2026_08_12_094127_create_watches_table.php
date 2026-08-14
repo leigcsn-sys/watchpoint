@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('watches', function (Blueprint $table) {
-            $table->id();
+            $table->ulid('id')->primary();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('url');
             $table->string('css_selector')->nullable();
@@ -21,6 +21,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamp('last_checked_at')->nullable();
             $table->timestamps();
+
+            $table->index(['is_active', 'last_checked_at']);
         });
     }
 
