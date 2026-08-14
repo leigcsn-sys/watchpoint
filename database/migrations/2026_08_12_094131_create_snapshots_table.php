@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('snapshots', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('watch_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('watch_id')->constrained()->cascadeOnDelete();
             $table->longText('content_text');
             $table->string('content_hash');
             $table->timestamp('fetched_at');
