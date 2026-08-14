@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('change_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('watch_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('watch_id')->constrained()->cascadeOnDelete();
             $table->foreignId('old_snapshot_id')->nullable()->constrained('snapshots');
             $table->foreignId('new_snapshot_id')->constrained('snapshots');
             $table->text('diff_summary');
