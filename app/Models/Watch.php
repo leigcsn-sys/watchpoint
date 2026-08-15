@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['user_id', 'url', 'css_selector', 'check_frequency_minutes', 'last_hash', 'is_active', 'last_checked_at'])]
+#[Fillable(['user_id', 'url', 'css_selector', 'check_frequency_minutes', 'last_hash', 'last_error', 'is_active', 'last_checked_at'])]
 class Watch extends Model
 {
     use HasFactory, HasUlids;
