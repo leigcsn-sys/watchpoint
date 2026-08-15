@@ -24,15 +24,21 @@ class CheckWatchJob implements ShouldQueue
         try {
             $text = $fetcher->fetchCleanText($this->watch->url, $this->watch->css_selector);
         } catch (\Throwable $e) {
-            $this->watch->update(['last_checked_at' => now()]);
-            return; // fail quietly, don't spam alerts for a down page
+            $this->watch->update([
+                'last_checked_at' => now(),
+                'last_error' => $e->getMessage(),
+            ]);
+            return;
         }
 
         $newHash = $fetcher->hash($text);
-        $this->watch->update(['last_checked_at' => now()]);
+        $this->watch->update([
+            'last_checked_at' => now(),
+            'last_error' => null,
+        ]);
 
         if ($newHash === $this->watch->last_hash) {
-            return; // no change
+            return;
         }
 
         $oldSnapshot = $this->watch->snapshots()->latest('fetched_at')->first();
