@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Watch;
 use App\Jobs\CheckWatchJob;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreWatchRequest;
 
 class WatchController extends Controller
 {
@@ -19,24 +19,19 @@ class WatchController extends Controller
         return view('watches.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreWatchRequest $request)
     {
-        $validated = $request->validate([
-            'url' => 'required|url|max:2048',
-            'css_selector' => 'nullable|string|max:255',
-            'check_frequency_minutes' => 'required|integer|min:5',
+        Watch::create([
+            ...$request->validated(),
+            'user_id' => auth()->id(),
         ]);
-
-        $validated['user_id'] = auth()->id();
-
-        Watch::create($validated);
 
         return redirect()->route('watches.index')->with('status', 'Watch created.');
     }
 
     public function show(Watch $watch)
     {
-        abort_unless($watch->user_id === auth()->id(), 403);
+        $this->authorize('view', $watch);
 
         $changeLogs = $watch->changeLogs()->latest('detected_at')->get();
 
@@ -45,7 +40,7 @@ class WatchController extends Controller
 
     public function destroy(Watch $watch)
     {
-        abort_unless($watch->user_id === auth()->id(), 403);
+        $this->authorize('delete', $watch);
 
         $watch->delete();
 
@@ -54,7 +49,7 @@ class WatchController extends Controller
 
     public function checkNow(Watch $watch)
     {
-        abort_unless($watch->user_id === auth()->id(), 403);
+        $this->authorize('update', $watch);
 
         if ($watch->last_checked_at && $watch->last_checked_at->diffInSeconds(now()) < 30) {
             return redirect()->route('watches.show', $watch)
