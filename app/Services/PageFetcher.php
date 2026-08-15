@@ -44,6 +44,12 @@ class PageFetcher
             throw new \InvalidArgumentException('Only http and https URLs are allowed.');
         }
 
+        // Allow local/private addresses only in local development, so you can
+        // test against your own machine without exposing this in production.
+        if (app()->environment('local')) {
+            return;
+        }
+
         $host = $parsed['host'] ?? '';
         $ip = filter_var($host, FILTER_VALIDATE_IP) ? $host : gethostbyname($host);
 
