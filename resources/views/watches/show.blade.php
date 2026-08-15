@@ -38,6 +38,12 @@
                     </form>
                 </div>
 
+                @if ($watch->last_error)
+                    <div class="mt-4 p-3 bg-[#F87171]/10 border border-[#F87171]/30 rounded-lg">
+                        <p class="text-xs text-[#F87171]">{{ $watch->last_error }}</p>
+                    </div>
+                @endif
+
                 <div class="mt-6 grid grid-cols-3 gap-4 pt-5 border-t border-[#253449]">
                     <div>
                         <p class="text-xs text-[#8996AC] mb-1">Frequency</p>
