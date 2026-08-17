@@ -1,64 +1,59 @@
 <x-app-layout>
     <x-slot name="header">
-        <p class="text-xs font-medium tracking-widest text-[#F5A524] uppercase mb-1">New</p>
-        <h2 class="font-['Space_Grotesk'] font-semibold text-2xl text-[#E7ECF5]">
-            Add a Watch
-        </h2>
+        <p class="font-['JetBrains_Mono'] text-xs text-[#9CA3AF] tracking-widest uppercase mb-1">02 — new</p>
+        <h2 class="text-2xl text-[#111111]">Add a Watch</h2>
     </x-slot>
 
-    <div class="py-10">
-        <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-[#121B2E] border border-[#253449] rounded-xl p-7">
+    <div class="py-12">
+        <div class="max-w-lg mx-auto sm:px-6 lg:px-8">
 
-                @if ($errors->any())
-                    <div class="mb-5 p-4 bg-[#F87171]/10 border border-[#F87171]/30 rounded-lg">
-                        <ul class="text-sm text-[#F87171] space-y-1">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+            @if ($errors->any())
+                <div class="mb-6 pb-4 border-b border-[#111111]">
+                    <ul class="font-['JetBrains_Mono'] text-xs text-[#111111] space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>&rarr; {{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                <form action="{{ route('watches.store') }}" method="POST" class="space-y-5">
-                    @csrf
+            <form action="{{ route('watches.store') }}" method="POST" class="space-y-6">
+                @csrf
 
-                    <div>
-                        <label for="url" class="block text-sm font-medium text-[#E7ECF5] mb-1.5">Page URL</label>
-                        <input type="url" name="url" id="url" required value="{{ old('url') }}"
-                               placeholder="https://example.com/page"
-                               class="w-full rounded-lg bg-[#0B1120] border-[#253449] text-[#E7ECF5] font-['JetBrains_Mono'] text-sm placeholder:text-[#8996AC]/60 focus:border-[#F5A524] focus:ring-[#F5A524]/20">
-                    </div>
+                <div>
+                    <label for="url" class="block font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#9CA3AF] mb-2">Page URL</label>
+                    <input type="url" name="url" id="url" required
+                           value="{{ old('url') }}"
+                           placeholder="https://example.com/page"
+                           class="w-full border-0 border-b border-[#E5E5E5] font-['JetBrains_Mono'] text-sm text-[#111111] px-0 py-2 focus:border-[#111111] focus:ring-0 placeholder:text-[#D1D5DB]">
+                </div>
 
-                    <div>
-                        <label for="css_selector" class="block text-sm font-medium text-[#E7ECF5] mb-1.5">
-                            CSS Selector <span class="text-[#8996AC] font-normal">— optional</span>
-                        </label>
-                        <input type="text" name="css_selector" id="css_selector" value="{{ old('css_selector') }}"
-                               placeholder="#main-content, .article-body"
-                               class="w-full rounded-lg bg-[#0B1120] border-[#253449] text-[#E7ECF5] font-['JetBrains_Mono'] text-sm placeholder:text-[#8996AC]/60 focus:border-[#F5A524] focus:ring-[#F5A524]/20">
-                        <p class="text-xs text-[#8996AC] mt-1.5">Scopes tracking to one part of the page. Leave blank to watch the whole page.</p>
-                    </div>
+                <div>
+                    <label for="css_selector" class="block font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#9CA3AF] mb-2">
+                        CSS Selector <span class="normal-case text-[#D1D5DB]">(optional)</span>
+                    </label>
+                    <input type="text" name="css_selector" id="css_selector" value="{{ old('css_selector') }}"
+                           placeholder="#main-content"
+                           class="w-full border-0 border-b border-[#E5E5E5] font-['JetBrains_Mono'] text-sm text-[#111111] px-0 py-2 focus:border-[#111111] focus:ring-0 placeholder:text-[#D1D5DB]">
+                </div>
 
-                    <div>
-                        <label for="check_frequency_minutes" class="block text-sm font-medium text-[#E7ECF5] mb-1.5">Check Frequency</label>
-                        <div class="relative">
-                            <input type="number" name="check_frequency_minutes" id="check_frequency_minutes" required
-                                   value="{{ old('check_frequency_minutes', 60) }}" min="5"
-                                   class="w-full rounded-lg bg-[#0B1120] border-[#253449] text-[#E7ECF5] text-sm focus:border-[#F5A524] focus:ring-[#F5A524]/20">
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#8996AC]">minutes</span>
-                        </div>
-                    </div>
+                <div>
+                    <label for="check_frequency_minutes" class="block font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#9CA3AF] mb-2">Check Frequency (minutes)</label>
+                    <input type="number" name="check_frequency_minutes" id="check_frequency_minutes" required
+                           value="{{ old('check_frequency_minutes', 60) }}" min="5"
+                           class="w-full border-0 border-b border-[#E5E5E5] font-['JetBrains_Mono'] text-sm text-[#111111] px-0 py-2 focus:border-[#111111] focus:ring-0">
+                </div>
 
-                    <div class="flex items-center gap-4 pt-2">
-                        <button type="submit"
-                                class="px-5 py-2.5 bg-[#F5A524] text-[#0B1120] rounded-lg text-sm font-semibold hover:bg-[#FFBB43] transition-colors">
-                            Create Watch
-                        </button>
-                        <a href="{{ route('watches.index') }}" class="text-sm text-[#8996AC] hover:text-[#E7ECF5] transition-colors">Cancel</a>
-                    </div>
-                </form>
-            </div>
+                <div class="flex items-center gap-6 pt-4">
+                    <button type="submit"
+                            class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest bg-[#111111] text-white px-6 py-3 hover:bg-[#333333] transition-colors">
+                        Create Watch
+                    </button>
+                    <a href="{{ route('watches.index') }}" class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-[#111111]">
+                        Cancel
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </x-app-layout>
