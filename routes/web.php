@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WatchController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('watches.index');
 });
 
 Route::get('/dashboard', function () {
