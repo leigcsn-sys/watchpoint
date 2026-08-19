@@ -25,7 +25,7 @@ Fetch page → strip noise → hash & compare → diff the text → log the chan
 
 ## How to use it
 
-There are no accounts. Open the app, and you're straight into the watch list.
+Create an account to keep your watch list private and available across sessions.
 
 1. Click **Add Watch**
 2. Paste a URL you want to monitor
@@ -69,11 +69,11 @@ php artisan migrate
 php artisan serve
 \`\`\`
 
-Open `http://127.0.0.1:8000` — no login needed, you're dropped straight into the app.
+Open `http://127.0.0.1:8000`, register an account, and then add your first watch.
 
 ## What I'd change for production
 
-- Currently checks run synchronously when you click "Check Now," which is fine for a demo but would block real users at scale — production would queue this and show a "checking..." state instead
+- Manual checks are queued and show a "checking..." state while the queue worker fetches the page
 - Scheduled background checks (via Laravel's scheduler) instead of manual-only checking
 - Adaptive check frequency instead of a fixed interval, based on how often a given page actually tends to change
 
