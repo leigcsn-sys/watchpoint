@@ -9,8 +9,8 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    return redirect()->route('watches.index');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -21,10 +21,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::resource('watches', WatchController::class)
         ->except(['edit', 'update'])
-        ->middleware(['throttle:20,1']); // 20 requests per minute across the resource
+        ->middleware(['throttle:20,1']);
 
     Route::post('watches/{watch}/check', [WatchController::class, 'checkNow'])
-        ->middleware('throttle:5,1') // max 5 manual checks per minute
+        ->middleware('throttle:5,1')
         ->name('watches.check');
 });
 
