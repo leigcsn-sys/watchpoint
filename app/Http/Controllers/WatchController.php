@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Watch;
 use App\Jobs\CheckWatchJob;
 use App\Http\Requests\StoreWatchRequest;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class WatchController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         $watches = auth()->user()->watches()->latest()->get();
