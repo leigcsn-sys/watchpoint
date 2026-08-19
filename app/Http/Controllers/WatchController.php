@@ -54,13 +54,23 @@ class WatchController extends Controller
     {
         $this->authorize('update', $watch);
 
+        if ($watch->is_checking) {
+            return redirect()->route('watches.show', $watch)
+                ->with('status', 'A check is already in progress.');
+        }
+
         if ($watch->last_checked_at && $watch->last_checked_at->diffInSeconds(now()) < 30) {
             return redirect()->route('watches.show', $watch)
                 ->with('status', 'Please wait a moment before checking again.');
         }
 
-        CheckWatchJob::dispatchSync($watch);
+        $watch->update([
+            'is_checking' => true,
+            'last_error' => null,
+        ]);
 
-        return redirect()->route('watches.show', $watch)->with('status', 'Check complete.');
+        CheckWatchJob::dispatch($watch);
+
+        return redirect()->route('watches.show', $watch)->with('status', 'Check queued.');
     }
 }
