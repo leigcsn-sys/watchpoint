@@ -27,6 +27,7 @@ class CheckWatchJob implements ShouldQueue
             $this->watch->update([
                 'last_checked_at' => now(),
                 'last_error' => $e->getMessage(),
+                'is_checking' => false,
             ]);
             return;
         }
@@ -35,6 +36,7 @@ class CheckWatchJob implements ShouldQueue
         $this->watch->update([
             'last_checked_at' => now(),
             'last_error' => null,
+            'is_checking' => false,
         ]);
 
         if ($newHash === $this->watch->last_hash) {
