@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-baseline">
+        <div class="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-baseline">
             <div>
                 <p class="font-['JetBrains_Mono'] text-xs text-[#9CA3AF] tracking-widest uppercase mb-1">03 — detail</p>
                 <h2 class="text-2xl text-[#111111]">Watch Overview</h2>
@@ -15,32 +15,41 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-10">
 
             @if (session('status'))
-                <p class="font-['JetBrains_Mono'] text-xs text-[#111111] pb-3 border-b border-[#E5E5E5]">&rarr; {{ session('status') }}</p>
+                <p role="status" class="font-['JetBrains_Mono'] text-xs text-[#111111] pb-3 border-b border-[#E5E5E5]">&rarr; {{ session('status') }}</p>
             @endif
 
             <div>
-                <div class="flex items-start justify-between gap-4 pb-6 border-b border-[#111111]">
+                <div class="flex flex-col items-stretch gap-5 pb-6 border-b border-[#111111] sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                     <div class="min-w-0">
                         <p class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#9CA3AF] mb-1">tracking</p>
-                        <a href="{{ $watch->url }}" target="_blank"
-                           class="font-['JetBrains_Mono'] text-sm text-[#111111] hover:underline break-all">
+                                <a href="{{ $watch->url }}" target="_blank" rel="noopener noreferrer"
+                                    class="font-['JetBrains_Mono'] text-sm text-[#111111] hover:underline break-words focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111111] focus-visible:ring-offset-4">
                             {{ $watch->url }}
                         </a>
                     </div>
                     <form action="{{ route('watches.check', $watch) }}" method="POST">
                         @csrf
-                        <button type="submit"
-                                class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest bg-[#111111] text-white px-5 py-2.5 hover:bg-[#333333] transition-colors whitespace-nowrap">
-                            Check Now
+                        <button type="submit" @disabled($watch->is_checking)
+                                class="w-full sm:w-auto font-['JetBrains_Mono'] text-xs uppercase tracking-widest bg-[#111111] text-white px-5 py-3 hover:bg-[#333333] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111111] focus-visible:ring-offset-4 transition-colors whitespace-nowrap disabled:cursor-wait disabled:bg-[#9CA3AF]">
+                            {{ $watch->is_checking ? 'Checking...' : 'Check Now' }}
                         </button>
                     </form>
                 </div>
 
                 @if ($watch->last_error)
-                    <p class="font-['JetBrains_Mono'] text-xs text-[#111111] mt-4 pt-4">&rarr; {{ $watch->last_error }}</p>
+                    <div role="alert" class="mt-4 border-l-2 border-[#DC2626] bg-[#FEF2F2] px-4 py-3">
+                        <p class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#B91C1C]">check failed</p>
+                        <p class="text-sm text-[#7F1D1D] mt-1 break-words">{{ Str::limit($watch->last_error, 220) }}</p>
+                        <p class="font-['JetBrains_Mono'] text-xs text-[#991B1B] mt-2">Run Check Now to retry.</p>
+                    </div>
+                @elseif ($watch->is_checking)
+                    <div role="status" class="mt-4 border-l-2 border-[#D97706] bg-[#FFFBEB] px-4 py-3">
+                        <p class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#92400E]">check queued</p>
+                        <p class="text-sm text-[#78350F] mt-1">The page will be fetched in the background.</p>
+                    </div>
                 @endif
 
-                <div class="grid grid-cols-3 gap-6 pt-6">
+                <div class="grid grid-cols-1 gap-5 pt-6 sm:grid-cols-3 sm:gap-6">
                     <div>
                         <p class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#9CA3AF] mb-1">frequency</p>
                         <p class="text-sm text-[#111111]">every {{ $watch->check_frequency_minutes }}m</p>
