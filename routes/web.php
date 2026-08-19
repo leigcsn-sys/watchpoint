@@ -5,11 +5,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WatchController;
 
 Route::get('/', function () {
-    return redirect()->route('watches.index');
+    return auth()->check()
+        ? redirect()->route('watches.index')
+        : redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {
-    return redirect()->route('watches.index');
+    return auth()->check()
+        ? redirect()->route('watches.index')
+        : redirect()->route('login');
 });
 
 Route::middleware('auth')->group(function () {
