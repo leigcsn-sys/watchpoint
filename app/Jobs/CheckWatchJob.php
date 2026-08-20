@@ -68,4 +68,12 @@ class CheckWatchJob implements ShouldQueue
 
         $this->watch->update(['last_hash' => $newHash]);
     }
+
+    public function failed(?\Throwable $exception): void
+    {
+        $this->watch->update([
+            'is_checking' => false,
+            'last_error' => 'The background check failed. Please try again.',
+        ]);
+    }
 }

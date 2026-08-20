@@ -69,7 +69,17 @@ class WatchController extends Controller
             'last_error' => null,
         ]);
 
-        CheckWatchJob::dispatch($watch);
+        try {
+            CheckWatchJob::dispatch($watch);
+        } catch (\Throwable $e) {
+            $watch->update([
+                'is_checking' => false,
+                'last_error' => 'The check could not be queued. Please try again.',
+            ]);
+
+            return redirect()->route('watches.show', $watch)
+                ->with('status', 'Check could not be queued.');
+        }
 
         return redirect()->route('watches.show', $watch)->with('status', 'Check queued.');
     }
