@@ -11,7 +11,7 @@
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12" @if ($watch->is_checking) x-data x-init="setTimeout(() => window.location.reload(), 5000)" @endif>
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-10">
 
             @if (session('status'))
