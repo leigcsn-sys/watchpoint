@@ -15,21 +15,19 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased text-[#111111]">
-        <div class="min-h-screen bg-[#F7F7F5]">
+    <body class="font-sans antialiased text-[#111827]">
+        <div class="min-h-screen">
             @include('layouts.navigation')
 
-            <!-- Page Heading -->
             @isset($header)
-                <header class="bg-[#F7F7F5] border-b border-[#E5E5E5]">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <header class="border-b border-[#e5e7eb] bg-white/60 backdrop-blur-sm">
+                    <div class="app-shell py-6">
                         {{ $header }}
                     </div>
                 </header>
             @endisset
 
-            <!-- Page Content -->
-            <main>
+            <main class="pb-14 pt-8 sm:pt-10">
                 {{ $slot }}
             </main>
         </div>

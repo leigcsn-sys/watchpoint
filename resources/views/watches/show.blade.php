@@ -1,90 +1,92 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-baseline">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <p class="font-['JetBrains_Mono'] text-xs text-[#9CA3AF] tracking-widest uppercase mb-1">03 — detail</p>
-                <h2 class="text-2xl text-[#111111]">Watch Overview</h2>
+                <p class="eyebrow mb-2">03 — detail</p>
+                <h2 class="text-3xl font-semibold tracking-tight text-[#111827]">Watch Overview</h2>
             </div>
-            <a href="{{ route('watches.index') }}" class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-[#111111]">
-                &larr; all watches
+            <a href="{{ route('watches.index') }}" class="secondary-button">
+                &larr; All Watches
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12" @if ($watch->is_checking) x-data x-init="setTimeout(() => window.location.reload(), 5000)" @endif>
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-10">
-
+    <div class="app-shell" @if ($watch->is_checking) x-data x-init="setTimeout(() => window.location.reload(), 5000)" @endif>
+        <div class="mx-auto max-w-4xl space-y-8">
             @if (session('status'))
-                <p role="status" class="font-['JetBrains_Mono'] text-xs text-[#111111] pb-3 border-b border-[#E5E5E5]">&rarr; {{ session('status') }}</p>
+                <p role="status" class="rounded-xl border border-[#dfe3e8] bg-white/80 px-4 py-3 text-sm text-[#111827] shadow-sm">
+                    <span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.18em] text-[#6B7280]">status</span>
+                    <span class="ml-3">{{ session('status') }}</span>
+                </p>
             @endif
 
-            <div>
-                <div class="flex flex-col items-stretch gap-5 pb-6 border-b border-[#111111] sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+            <div class="panel p-5 sm:p-6">
+                <div class="flex flex-col gap-5 border-b border-[#e5e7eb] pb-6 sm:flex-row sm:items-start sm:justify-between">
                     <div class="min-w-0">
-                        <p class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#9CA3AF] mb-1">tracking</p>
-                                <a href="{{ $watch->url }}" target="_blank" rel="noopener noreferrer"
-                                    class="font-['JetBrains_Mono'] text-sm text-[#111111] hover:underline break-words focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111111] focus-visible:ring-offset-4">
+                        <p class="section-label mb-2">Tracking</p>
+                        <a href="{{ $watch->url }}" target="_blank" rel="noopener noreferrer"
+                           class="break-words font-['JetBrains_Mono'] text-sm text-[#111827] hover:text-[#374151] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827] focus-visible:ring-offset-2">
                             {{ $watch->url }}
                         </a>
                     </div>
                     <form action="{{ route('watches.check', $watch) }}" method="POST">
                         @csrf
                         <button type="submit" @disabled($watch->is_checking)
-                                class="w-full sm:w-auto font-['JetBrains_Mono'] text-xs uppercase tracking-widest bg-[#111111] text-white px-5 py-3 hover:bg-[#333333] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111111] focus-visible:ring-offset-4 transition-colors whitespace-nowrap disabled:cursor-wait disabled:bg-[#9CA3AF]">
+                                class="primary-button w-full whitespace-nowrap sm:w-auto disabled:cursor-wait disabled:bg-[#9CA3AF]">
                             {{ $watch->is_checking ? 'Checking...' : 'Check Now' }}
                         </button>
                     </form>
                 </div>
 
                 @if ($watch->last_error)
-                    <div role="alert" class="mt-4 border-l-2 border-[#DC2626] bg-[#FEF2F2] px-4 py-3">
-                        <p class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#B91C1C]">check failed</p>
-                        <p class="text-sm text-[#7F1D1D] mt-1 break-words">{{ Str::limit($watch->last_error, 220) }}</p>
-                        <p class="font-['JetBrains_Mono'] text-xs text-[#991B1B] mt-2">Run Check Now to retry.</p>
+                    <div role="alert" class="mt-5 rounded-xl border border-[#FECACA] bg-[#FEF2F2] p-4">
+                        <p class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.18em] text-[#B91C1C]">check failed</p>
+                        <p class="mt-2 text-sm text-[#7F1D1D] break-words">{{ Str::limit($watch->last_error, 220) }}</p>
+                        <p class="mt-2 font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.18em] text-[#991B1B]">Run Check Now to retry.</p>
                     </div>
                 @elseif ($watch->is_checking)
-                    <div role="status" class="mt-4 border-l-2 border-[#D97706] bg-[#FFFBEB] px-4 py-3">
-                        <p class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#92400E]">check queued</p>
-                        <p class="text-sm text-[#78350F] mt-1">The page will be fetched in the background.</p>
+                    <div role="status" class="mt-5 rounded-xl border border-[#FDE68A] bg-[#FFFBEB] p-4">
+                        <p class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.18em] text-[#92400E]">check queued</p>
+                        <p class="mt-2 text-sm text-[#78350F]">The page will be fetched in the background.</p>
                     </div>
                 @endif
 
-                <div class="grid grid-cols-1 gap-5 pt-6 sm:grid-cols-3 sm:gap-6">
-                    <div>
-                        <p class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#9CA3AF] mb-1">frequency</p>
-                        <p class="text-sm text-[#111111]">every {{ $watch->check_frequency_minutes }}m</p>
+                <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div class="rounded-xl border border-[#e5e7eb] bg-[#F9FAFB] p-4">
+                        <p class="section-label mb-2">frequency</p>
+                        <p class="text-sm font-medium text-[#111827]">every {{ $watch->check_frequency_minutes }}m</p>
                     </div>
-                    <div>
-                        <p class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#9CA3AF] mb-1">last checked</p>
-                        <p class="text-sm text-[#111111]">{{ $watch->last_checked_at?->diffForHumans() ?? 'never' }}</p>
+                    <div class="rounded-xl border border-[#e5e7eb] bg-[#F9FAFB] p-4">
+                        <p class="section-label mb-2">last checked</p>
+                        <p class="text-sm font-medium text-[#111827]">{{ $watch->last_checked_at?->diffForHumans() ?? 'never' }}</p>
                     </div>
-                    <div>
-                        <p class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#9CA3AF] mb-1">scope</p>
-                        <p class="font-['JetBrains_Mono'] text-sm text-[#111111]">{{ $watch->css_selector ?? 'full page' }}</p>
+                    <div class="rounded-xl border border-[#e5e7eb] bg-[#F9FAFB] p-4">
+                        <p class="section-label mb-2">scope</p>
+                        <p class="font-['JetBrains_Mono'] text-sm text-[#111827]">{{ $watch->css_selector ?? 'full page' }}</p>
                     </div>
                 </div>
             </div>
 
-            <div>
-                <p class="font-['JetBrains_Mono'] text-xs text-[#9CA3AF] tracking-widest uppercase mb-5">change history</p>
+            <div class="panel p-5 sm:p-6">
+                <p class="section-label mb-5">change history</p>
 
                 @if ($changeLogs->isEmpty())
-                    <p class="text-sm text-[#9CA3AF] py-6 border-t border-[#E5E5E5]">
+                    <p class="rounded-xl border border-dashed border-[#dfe3e8] bg-[#F9FAFB] px-4 py-8 text-sm text-[#6B7280]">
                         No changes detected yet. Run a check to establish a baseline.
                     </p>
                 @else
-                    <div class="border-t border-[#E5E5E5]">
-                        @foreach ($changeLogs as $index => $log)
-                            <div class="py-6 border-b border-[#E5E5E5]">
-                                <div class="flex items-baseline gap-3 mb-3">
-                                    <span class="font-['JetBrains_Mono'] text-xs text-[#D1D5DB]">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
-                                    <span class="font-['JetBrains_Mono'] text-xs text-[#9CA3AF]">{{ $log->detected_at->diffForHumans() }}</span>
+                    <div class="space-y-5">
+                        @foreach ($changeLogs as $log)
+                            <div class="rounded-xl border border-[#e5e7eb] bg-[#F9FAFB] p-4">
+                                <div class="mb-3 flex items-center gap-3">
+                                    <span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.18em] text-[#9CA3AF]">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                                    <span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.18em] text-[#6B7280]">{{ $log->detected_at->diffForHumans() }}</span>
                                 </div>
-                                <div class="bg-[#FAFAFA] border border-[#E5E5E5] p-4 overflow-x-auto">
-                                    <pre class="font-['JetBrains_Mono'] text-xs leading-relaxed">@foreach (explode("\n", $log->diff_summary) as $line)
+                                <div class="overflow-x-auto rounded-lg border border-[#e5e7eb] bg-white p-3">
+                                    <pre class="font-['JetBrains_Mono'] text-[11px] leading-relaxed">@foreach (explode("\n", $log->diff_summary) as $line)
 @if (str_starts_with(ltrim($line), '+') && !str_starts_with(ltrim($line), '+++'))<span class="text-[#059669]">{{ $line }}</span>
 @elseif (str_starts_with(ltrim($line), '-') && !str_starts_with(ltrim($line), '---'))<span class="text-[#DC2626]">{{ $line }}</span>
-@else<span class="text-[#9CA3AF]">{{ $line }}</span>
+@else<span class="text-[#6B7280]">{{ $line }}</span>
 @endif
 @endforeach</pre>
                                 </div>

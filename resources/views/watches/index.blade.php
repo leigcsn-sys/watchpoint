@@ -1,56 +1,56 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-baseline">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <p class="font-['JetBrains_Mono'] text-xs text-[#9CA3AF] tracking-widest uppercase mb-1">01 — watches</p>
-                <h2 class="text-2xl text-[#111111]">Your Watches</h2>
+                <p class="eyebrow mb-2">01 — watches</p>
+                <h2 class="text-3xl font-semibold tracking-tight text-[#111827]">Your Watches</h2>
             </div>
-            <a href="{{ route('watches.create') }}"
-               class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest border border-[#111111] text-[#111111] px-4 py-2 hover:bg-[#111111] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111111] focus-visible:ring-offset-4 transition-colors">
+            <a href="{{ route('watches.create') }}" class="primary-button">
                 + Add Watch
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-
+    <div class="app-shell">
+        <div class="mx-auto max-w-4xl">
             @if (session('status'))
-                <p role="status" class="font-['JetBrains_Mono'] text-xs text-[#111111] mb-6 pb-3 border-b border-[#E5E5E5]">
-                    &rarr; {{ session('status') }}
+                <p role="status" class="mb-6 rounded-xl border border-[#dfe3e8] bg-white/80 px-4 py-3 text-sm text-[#111827] shadow-sm">
+                    <span class="font-['JetBrains_Mono'] text-[11px] uppercase tracking-[0.18em] text-[#6B7280]">status</span>
+                    <span class="ml-3">{{ session('status') }}</span>
                 </p>
             @endif
 
             @if ($watches->isEmpty())
-                <div class="py-16 text-center border-t border-b border-[#E5E5E5]">
-                    <p class="text-[#6B7280] mb-2">Nothing being watched yet.</p>
-                    <a href="{{ route('watches.create') }}" class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#111111] underline">
-                        Add your first one &rarr;
+                <div class="panel py-16 text-center">
+                    <p class="mb-3 text-lg font-medium text-[#111827]">Nothing being watched yet.</p>
+                    <p class="mb-5 text-sm text-[#6B7280]">Add a page to start tracking changes.</p>
+                    <a href="{{ route('watches.create') }}" class="secondary-button">
+                        Add your first one
                     </a>
                 </div>
             @else
-                <div class="border-t border-[#E5E5E5]">
+                <div class="space-y-4">
                     @foreach ($watches as $watch)
-                        <div class="flex flex-col items-stretch gap-4 py-5 border-b border-[#E5E5E5] group sm:flex-row sm:items-center sm:justify-between">
+                        <div class="panel group flex flex-col gap-4 p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-30px_rgba(17,24,39,0.55)] sm:flex-row sm:items-center sm:justify-between">
                             <div class="min-w-0 flex-1">
-                                <div class="flex items-center gap-2 mb-1.5">
-                                    <span class="w-1.5 h-1.5 rounded-full {{ $watch->is_active ? 'bg-[#111111]' : 'bg-[#D1D5DB]' }}"></span>
-                                    <span class="font-['JetBrains_Mono'] text-[11px] uppercase tracking-widest text-[#9CA3AF]">
+                                <div class="mb-2 flex items-center gap-2">
+                                    <span class="inline-block h-2.5 w-2.5 rounded-full {{ $watch->is_active ? 'bg-[#22C55E]' : 'bg-[#D1D5DB]' }}"></span>
+                                    <span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.2em] text-[#6B7280]">
                                         {{ $watch->is_active ? 'active' : 'paused' }} &middot; every {{ $watch->check_frequency_minutes }}m
                                     </span>
                                 </div>
-                                <a href="{{ route('watches.show', $watch) }}"
-                                   class="font-['JetBrains_Mono'] text-sm text-[#111111] group-hover:underline break-words block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111111] focus-visible:ring-offset-4">
+                                <a href="{{ route('watches.show', $watch) }}" class="block break-words text-base font-medium text-[#111827] transition group-hover:text-[#111827] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827] focus-visible:ring-offset-2">
                                     {{ $watch->url }}
                                 </a>
-                                <p class="text-xs text-[#9CA3AF] mt-1">
+                                <p class="mt-2 text-sm text-[#6B7280]">
                                     last checked {{ $watch->last_checked_at?->diffForHumans() ?? 'never' }}
                                 </p>
                             </div>
-                            <form action="{{ route('watches.destroy', $watch) }}" method="POST" onsubmit="return confirm('Delete this watch?')">
+
+                            <form action="{{ route('watches.destroy', $watch) }}" method="POST" onsubmit="return confirm('Delete this watch?')" class="shrink-0">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" aria-label="Remove {{ $watch->url }}" class="font-['JetBrains_Mono'] text-xs text-[#9CA3AF] hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626] focus-visible:ring-offset-4 transition-colors sm:px-2 sm:py-2 sm:-mr-2">
+                                <button type="submit" aria-label="Remove {{ $watch->url }}" class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.18em] text-[#6B7280] transition hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626] focus-visible:ring-offset-2">
                                     remove
                                 </button>
                             </form>
