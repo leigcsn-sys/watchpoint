@@ -9,16 +9,16 @@ class WatchPolicy
 {
     public function view(User $user, Watch $watch): bool
     {
-        return $user->id === $watch->user_id;
+        return true;
     }
 
     public function delete(User $user, Watch $watch): bool
     {
-        return $user->id === $watch->user_id;
+        return true;
     }
 
     public function update(User $user, Watch $watch): bool
     {
-        return $user->id === $watch->user_id;
+        return true;
     }
 }
