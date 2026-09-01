@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Watch;
 use App\Jobs\CheckWatchJob;
 use App\Http\Requests\StoreWatchRequest;
+use App\Models\User;
+use App\Models\Watch;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Str;
 
 class WatchController extends Controller
 {
@@ -13,7 +15,8 @@ class WatchController extends Controller
 
     public function index()
     {
-        $watches = auth()->user()->watches()->latest()->get();
+        $watches = Watch::query()->latest()->get();
+
         return view('watches.index', compact('watches'));
     }
 
@@ -26,7 +29,7 @@ class WatchController extends Controller
     {
         Watch::create([
             ...$request->validated(),
-            'user_id' => auth()->id(),
+            'user_id' => $this->publicUserId(),
         ]);
 
         return redirect()->route('watches.index')->with('status', 'Watch created.');
@@ -34,8 +37,6 @@ class WatchController extends Controller
 
     public function show(Watch $watch)
     {
-        $this->authorize('view', $watch);
-
         $changeLogs = $watch->changeLogs()->latest('detected_at')->get();
 
         return view('watches.show', compact('watch', 'changeLogs'));
@@ -43,8 +44,6 @@ class WatchController extends Controller
 
     public function destroy(Watch $watch)
     {
-        $this->authorize('delete', $watch);
-
         $watch->delete();
 
         return redirect()->route('watches.index')->with('status', 'Watch deleted.');
@@ -52,8 +51,6 @@ class WatchController extends Controller
 
     public function checkNow(Watch $watch)
     {
-        $this->authorize('update', $watch);
-
         if ($watch->is_checking) {
             return redirect()->route('watches.show', $watch)
                 ->with('status', 'A check is already in progress.');
@@ -82,5 +79,18 @@ class WatchController extends Controller
         }
 
         return redirect()->route('watches.show', $watch)->with('status', 'Check queued.');
+    }
+
+    private function publicUserId(): int
+    {
+        $user = User::query()->firstOrCreate(
+            ['email' => 'public@watchpoint.local'],
+            [
+                'name' => 'Public Watcher',
+                'password' => bcrypt(Str::random(32)),
+            ]
+        );
+
+        return $user->id;
     }
 }
