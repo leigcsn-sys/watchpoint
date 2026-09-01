@@ -1,63 +1,71 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div class="editorial-shell">
+        <div class="editorial-header">
             <div>
-                <p class="eyebrow mb-2">01 — watches</p>
-                <h2 class="text-3xl font-semibold tracking-tight text-[#111827]">Your Watches</h2>
+                <p class="editorial-kicker">watchpoint</p>
+                <h1 class="editorial-title">Watch what matters.</h1>
             </div>
-            <a href="{{ route('watches.create') }}" class="primary-button">
-                + Add Watch
-            </a>
+
+            <div class="editorial-copy">
+                <p>Track the pages you care about and get notified when the important parts change.</p>
+                <div class="editorial-meta">
+                    <a href="{{ route('watches.create') }}" class="text-[#171613] underline decoration-1 underline-offset-4">add watch</a>
+                    <span>•</span>
+                    <span>public list</span>
+                </div>
+            </div>
         </div>
-    </x-slot>
 
-    <div class="app-shell">
-        <div class="mx-auto max-w-4xl">
-            @if (session('status'))
-                <p role="status" class="mb-6 rounded-xl border border-[#dfe3e8] bg-white/80 px-4 py-3 text-sm text-[#111827] shadow-sm">
-                    <span class="font-['JetBrains_Mono'] text-[11px] uppercase tracking-[0.18em] text-[#6B7280]">status</span>
-                    <span class="ml-3">{{ session('status') }}</span>
-                </p>
-            @endif
+        <div class="editorial-grid">
+            <aside class="editorial-left">
+                <nav aria-label="Main navigation">
+                    <a href="#">Home</a>
+                </nav>
+            </aside>
 
-            @if ($watches->isEmpty())
-                <div class="panel py-16 text-center">
-                    <p class="mb-3 text-lg font-medium text-[#111827]">Nothing being watched yet.</p>
-                    <p class="mb-5 text-sm text-[#6B7280]">Add a page to start tracking changes.</p>
+            <div class="editorial-main">
+                @if (session('status'))
+                    <p role="status" class="mb-5 rounded-xl border border-[#dfe3e8] bg-white/60 px-4 py-3 text-sm text-[#171613] shadow-sm">
+                        <span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.18em] text-[#6B7280]">status</span>
+                        <span class="ml-3">{{ session('status') }}</span>
+                    </p>
+                @endif
+
+                <div class="watch-hero">
+                    <div class="badge">01 — watches</div>
                     <a href="{{ route('watches.create') }}" class="secondary-button">
-                        Add your first one
+                        + Add Watch
                     </a>
                 </div>
-            @else
-                <div class="space-y-4">
-                    @foreach ($watches as $watch)
-                        <div class="panel group flex flex-col gap-4 p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-30px_rgba(17,24,39,0.55)] sm:flex-row sm:items-center sm:justify-between">
-                            <div class="min-w-0 flex-1">
-                                <div class="mb-2 flex items-center gap-2">
-                                    <span class="inline-block h-2.5 w-2.5 rounded-full {{ $watch->is_active ? 'bg-[#22C55E]' : 'bg-[#D1D5DB]' }}"></span>
-                                    <span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.2em] text-[#6B7280]">
-                                        {{ $watch->is_active ? 'active' : 'paused' }} &middot; every {{ $watch->check_frequency_minutes }}m
-                                    </span>
-                                </div>
-                                <a href="{{ route('watches.show', $watch) }}" class="block break-words text-base font-medium text-[#111827] transition group-hover:text-[#111827] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827] focus-visible:ring-offset-2">
-                                    {{ $watch->url }}
-                                </a>
-                                <p class="mt-2 text-sm text-[#6B7280]">
-                                    last checked {{ $watch->last_checked_at?->diffForHumans() ?? 'never' }}
-                                </p>
-                            </div>
 
-                            <form action="{{ route('watches.destroy', $watch) }}" method="POST" onsubmit="return confirm('Delete this watch?')" class="shrink-0">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" aria-label="Remove {{ $watch->url }}" class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.18em] text-[#6B7280] transition hover:text-[#DC2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626] focus-visible:ring-offset-2">
-                                    remove
-                                </button>
-                            </form>
+                <div class="watch-list">
+                    @if ($watches->isEmpty())
+                        <div class="watch-item">
+                            <div class="watch-row">
+                                <div>
+                                    <span class="watch-title">No watches yet</span>
+                                    <p class="watch-preview">Add your first page to start tracking meaningful updates.</p>
+                                </div>
+                                <span class="watch-date">new</span>
+                            </div>
                         </div>
-                    @endforeach
+                    @else
+                        @foreach ($watches as $watch)
+                            <a href="{{ route('watches.show', $watch) }}" class="watch-item">
+                                <div class="watch-row">
+                                    <div>
+                                        <span class="watch-title">{{ Str::limit($watch->url, 80) }}</span>
+                                        <p class="watch-preview">
+                                            {{ $watch->css_selector ? 'Scoped to: ' . $watch->css_selector : 'Monitoring the full page for meaningful changes.' }}
+                                        </p>
+                                    </div>
+                                    <span class="watch-date">{{ $watch->last_checked_at ? $watch->last_checked_at->format('M j, Y') : 'New' }}</span>
+                                </div>
+                            </a>
+                        @endforeach
+                    @endif
                 </div>
-            @endif
+            </div>
         </div>
     </div>
 </x-app-layout>
