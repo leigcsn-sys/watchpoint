@@ -4,7 +4,10 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "dev:queue": "php artisan queue:work --tries=3 --timeout=60",
+        "dev:scheduler": "php artisan schedule:work",
+        "dev:full": "concurrently -n web,queue,scheduler \"php artisan serve\" \"php artisan queue:work --tries=3 --timeout=60\" \"php artisan schedule:work\""
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",

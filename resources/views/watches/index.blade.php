@@ -1,71 +1,61 @@
 <x-app-layout>
-    <div class="editorial-shell">
-        <div class="editorial-header">
+    <div class="watchpoint-shell">
+        <header class="watchpoint-header">
+            <span class="watchpoint-kicker">watchpoint</span>
+            <a href="{{ route('watches.create') }}" class="watchpoint-link">+ add watch</a>
+        </header>
+
+        <div class="watchpoint-hero">
             <div>
-                <p class="editorial-kicker">watchpoint</p>
-                <h1 class="editorial-title">Watch what matters.</h1>
+                <h1 class="watchpoint-title">Watch what matters.</h1>
+                <p class="watchpoint-subtitle">
+                    Track the pages you care about and get notified when the important parts change.
+                </p>
             </div>
 
-            <div class="editorial-copy">
-                <p>Track the pages you care about and get notified when the important parts change.</p>
-                <div class="editorial-meta">
-                    <a href="{{ route('watches.create') }}" class="text-[#171613] underline decoration-1 underline-offset-4">add watch</a>
-                    <span>•</span>
-                    <span>public list</span>
-                </div>
+            <div class="watchpoint-actions">
+                <a href="{{ route('watches.create') }}" class="primary-button">+ Add Watch</a>
             </div>
         </div>
 
-        <div class="editorial-grid">
-            <aside class="editorial-left">
-                <nav aria-label="Main navigation">
-                    <a href="#">Home</a>
-                </nav>
-            </aside>
+        @if (session('status'))
+            <p role="status" class="watchpoint-status">
+                <span class="watchpoint-inline-label">status</span>
+                <span>{{ session('status') }}</span>
+            </p>
+        @endif
 
-            <div class="editorial-main">
-                @if (session('status'))
-                    <p role="status" class="mb-5 rounded-xl border border-[#dfe3e8] bg-white/60 px-4 py-3 text-sm text-[#171613] shadow-sm">
-                        <span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.18em] text-[#6B7280]">status</span>
-                        <span class="ml-3">{{ session('status') }}</span>
-                    </p>
-                @endif
+        <div class="watchpoint-section">
+            <span class="watchpoint-inline-label">01 — watches</span>
+            <a href="{{ route('watches.create') }}" class="watchpoint-link">all watches →</a>
+        </div>
 
-                <div class="watch-hero">
-                    <div class="badge">01 — watches</div>
-                    <a href="{{ route('watches.create') }}" class="secondary-button">
-                        + Add Watch
-                    </a>
-                </div>
-
-                <div class="watch-list">
-                    @if ($watches->isEmpty())
-                        <div class="watch-item">
-                            <div class="watch-row">
-                                <div>
-                                    <span class="watch-title">No watches yet</span>
-                                    <p class="watch-preview">Add your first page to start tracking meaningful updates.</p>
-                                </div>
-                                <span class="watch-date">new</span>
-                            </div>
+        <div class="watchpoint-list">
+            @if ($watches->isEmpty())
+                <article class="watchpoint-item empty-state">
+                    <div class="watchpoint-row">
+                        <div class="watchpoint-copy">
+                            <p class="watchpoint-item-title">No watches yet</p>
+                            <p class="watchpoint-preview">Add your first page to start monitoring meaningful updates.</p>
                         </div>
-                    @else
-                        @foreach ($watches as $watch)
-                            <a href="{{ route('watches.show', $watch) }}" class="watch-item">
-                                <div class="watch-row">
-                                    <div>
-                                        <span class="watch-title">{{ Str::limit($watch->url, 80) }}</span>
-                                        <p class="watch-preview">
-                                            {{ $watch->css_selector ? 'Scoped to: ' . $watch->css_selector : 'Monitoring the full page for meaningful changes.' }}
-                                        </p>
-                                    </div>
-                                    <span class="watch-date">{{ $watch->last_checked_at ? $watch->last_checked_at->format('M j, Y') : 'New' }}</span>
-                                </div>
-                            </a>
-                        @endforeach
-                    @endif
-                </div>
-            </div>
+                        <span class="watchpoint-date">new</span>
+                    </div>
+                </article>
+            @else
+                @foreach ($watches as $watch)
+                    <article class="watchpoint-item">
+                        <a href="{{ route('watches.show', $watch) }}" class="watchpoint-row">
+                            <div class="watchpoint-copy">
+                                <p class="watchpoint-item-title">{{ Str::limit($watch->url, 80) }}</p>
+                                <p class="watchpoint-preview">
+                                    {{ $watch->css_selector ? 'Scoped to: ' . $watch->css_selector : 'Monitoring the full page for meaningful changes.' }}
+                                </p>
+                            </div>
+                            <span class="watchpoint-date">{{ $watch->last_checked_at ? $watch->last_checked_at->format('M j, Y') : 'new' }}</span>
+                        </a>
+                    </article>
+                @endforeach
+            @endif
         </div>
     </div>
 </x-app-layout>
